@@ -40,3 +40,4 @@ npm run format:check
 The project intentionally contains only the entry point and required tooling. Add the team's application folder structure next to `Base.js`, after agreeing on and documenting the design.
 
 The RFP does not mandate any technology or architecture for this part of the system. The team must justify both its technology choices and its architectural choices.# LEI-SEM5-PI-2026-27-3DL-E-C
+# LEI-SEM5-PI-2026-27-3DL-E-C

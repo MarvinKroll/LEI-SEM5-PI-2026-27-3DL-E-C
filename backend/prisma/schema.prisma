@@ -1,0 +1,201 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ─────────────────────────────────────────────────────────────
+// BCK01: User & Authentication Management
+// ─────────────────────────────────────────────────────────────
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String   // Hashed with bcrypt
+  name      String
+  role      String   // "MANAGER", "STAFF", "CUSTOMER"
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  customer  Customer?
+}
+
+// ─────────────────────────────────────────────────────────────
+// BCK02: Customer Management & Dietary Restrictions
+// ─────────────────────────────────────────────────────────────
+model Customer {
+  id                  String   @id @default(uuid())
+  userId              String?  @unique
+  user                User?    @relation(fields: [userId], references: [id])
+  name                String
+  email               String   @unique
+  phone               String?
+  vatNumber           String?
+  address             String?
+  dietaryRestrictions DietaryRestriction[]
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model DietaryRestriction {
+  id          String     @id @default(uuid())
+  name        String     @unique
+  description String?
+  customers   Customer[]
+  allergens   Allergen[]
+}
+
+// ─────────────────────────────────────────────────────────────
+// BCK03: Product Category Management
+// ─────────────────────────────────────────────────────────────
+model ProductCategory {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  description String?
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+// ─────────────────────────────────────────────────────────────
+// BCK04: Allergen Management
+// ─────────────────────────────────────────────────────────────
+model Allergen {
+  id                  String               @id @default(uuid())
+  code                String               @unique
+  name                String               @unique
+  description         String?
+  products            Product[]
+  dietaryRestrictions DietaryRestriction[]
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+}
+
+// ─────────────────────────────────────────────────────────────
+// BCK06: Pizza Size Management
+// ─────────────────────────────────────────────────────────────
+model PizzaSize {
+  id          String   @id @default(uuid())
+  name        String   @unique // e.g. "Small", "Medium", "Large"
+  diameterCm  Int?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  sizeConfigurations ComponentSizeConfiguration[]
+  configurations     PizzaConfiguration[]
+}
+
+// ─────────────────────────────────────────────────────────────
+// BCK07: Pizza Component Type Management
+// ─────────────────────────────────────────────────────────────
+model PizzaComponentType {
+  id            String    @id @default(uuid())
+  name          String    @unique // e.g. "Base Dough", "Base Sauce", "Cheese", "Topping"
+  assemblyOrder Int       @unique // 1, 2, 3, 4
+  minQuantity   Int       @default(0)
+  maxQuantity   Int?      // null indicates unbounded
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  products      Product[]
+}
+
+// ─────────────────────────────────────────────────────────────
+// BCK05: Product Management
+// ─────────────────────────────────────────────────────────────
+model Product {
+  id                String             @id @default(uuid())
+  name              String             @unique
+  description       String?
+  categoryId        String
+  category          ProductCategory    @relation(fields: [categoryId], references: [id])
+  isSellable        Boolean            @default(false)
+  isStockControlled Boolean            @default(false)
+  isPizzaComponent  Boolean            @default(false)
+  isActive          Boolean            @default(true)
+  basePrice         Float?             // For directly sellable products (e.g. drinks)
+  
+  componentTypeId   String?
+  componentType     PizzaComponentType? @relation(fields: [componentTypeId], references: [id])
+  
+  allergens         Allergen[]
+  stock             StockInformation?
+  sizeConfigs       ComponentSizeConfiguration[]
+
+  // References if product is a predefined pizza
+  predefinedPizza   PredefinedPizza?
+
+  // Join table for pizza configurations containing this component
+  usedInPizzaConfigs PizzaConfigComponent[]
+
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+}
+
+// ─────────────────────────────────────────────────────────────
+// BCK08: Pizza Component Configuration (Size-Dependent)
+// ─────────────────────────────────────────────────────────────
+model ComponentSizeConfiguration {
+  id                 String   @id @default(uuid())
+  productId          String
+  product            Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  pizzaSizeId        String
+  pizzaSize          PizzaSize @relation(fields: [pizzaSizeId], references: [id], onDelete: Restrict)
+  price              Float    // Extra price when used on this size
+  stockUnitsConsumed Int      @default(1) // Abstract stock units consumed
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@unique([productId, pizzaSizeId])
+}
+
+// ─────────────────────────────────────────────────────────────
+// BCK09: Stock Information Management
+// ─────────────────────────────────────────────────────────────
+model StockInformation {
+  id                String   @id @default(uuid())
+  productId         String   @unique
+  product           Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  currentStockUnits Int      @default(0) // Non-negative integer
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+// ─────────────────────────────────────────────────────────────
+// BCK10: Predefined Pizza Management
+// ─────────────────────────────────────────────────────────────
+model PredefinedPizza {
+  id                   String             @id @default(uuid())
+  productId            String             @unique
+  product              Product            @relation(fields: [productId], references: [id], onDelete: Cascade)
+  defaultConfigId      String             @unique
+  defaultConfiguration PizzaConfiguration @relation(fields: [defaultConfigId], references: [id], onDelete: Cascade)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+}
+
+model PizzaConfiguration {
+  id          String                 @id @default(uuid())
+  pizzaSizeId String
+  pizzaSize   PizzaSize              @relation(fields: [pizzaSizeId], references: [id])
+  components  PizzaConfigComponent[]
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+
+  predefinedPizza PredefinedPizza?
+}
+
+model PizzaConfigComponent {
+  id              String             @id @default(uuid())
+  configurationId String
+  configuration   PizzaConfiguration @relation(fields: [configurationId], references: [id], onDelete: Cascade)
+  productId       String
+  product         Product            @relation(fields: [productId], references: [id])
+  quantity        Int                @default(1)
+
+  @@unique([configurationId, productId])
+}

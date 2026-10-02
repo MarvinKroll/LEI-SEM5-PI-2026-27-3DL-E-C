@@ -18,6 +18,40 @@ export const swaggerDocument = {
     },
   },
   paths: {
+    '/api/v1/health': {
+      get: {
+        summary: 'Service Health Check (Base Technical Skeleton)',
+        tags: ['System'],
+        responses: {
+          200: {
+            description: 'Service is healthy and reachable',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'ok' },
+                    version: { type: 'string', example: '1.0.0' },
+                    timestamp: { type: 'string', example: '2026-10-02T11:00:00.000Z' },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    '/api/health': {
+      get: {
+        summary: 'Legacy Service Health Check',
+        tags: ['System'],
+        responses: {
+          200: {
+            description: 'Service is healthy',
+          },
+        },
+      },
+    },
     '/api/auth/login': {
       post: {
         summary: 'Authenticate user and obtain JWT token (BCK01)',

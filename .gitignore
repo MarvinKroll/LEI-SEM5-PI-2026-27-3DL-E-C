@@ -24,6 +24,7 @@ yarn-error.log*
 Thumbs.db
 .vscode/
 .idea/
+*.exe
 
 # Testing & Coverage
 coverage/

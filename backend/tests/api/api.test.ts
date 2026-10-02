@@ -24,6 +24,14 @@ describe('LaPrizza REST API Integration Tests (ARC03 / ARC05)', () => {
     await prisma.$disconnect();
   });
 
+  it('GET /api/v1/health should return ok status, version and ISO-8601 timestamp (Base Skeleton)', async () => {
+    const res = await request(app).get('/api/v1/health');
+    expect(res.status).toBe(200);
+    expect(res.body.status).toBe('ok');
+    expect(res.body.version).toBeDefined();
+    expect(new Date(res.body.timestamp).toISOString()).toBe(res.body.timestamp);
+  });
+
   it('GET /api/health should return ok status', async () => {
     const res = await request(app).get('/api/health');
     expect(res.status).toBe(200);

@@ -18,19 +18,47 @@ import { errorHandler } from './presentation/middlewares/errorHandler';
 export function createApp(): Application {
   const app = express();
 
-  // Core Middlewares
-  app.use(cors());
+  // Request Logging Middleware
+  app.use((req, res, next) => {
+    const start = Date.now();
+    res.on('finish', () => {
+      const duration = Date.now() - start;
+      console.log(`[${new Date().toISOString()}] ${req.method} ${req.originalUrl} ${res.statusCode} - ${duration}ms`);
+    });
+    next();
+  });
+
+  // CORS Configuration (configurable via CORS_ORIGIN env variable, default http://localhost:5173)
+  const allowedOrigin = process.env.CORS_ORIGIN || 'http://localhost:5173';
+  app.use(
+    cors({
+      origin: allowedOrigin.includes(',')
+        ? allowedOrigin.split(',').map((o) => o.trim())
+        : allowedOrigin,
+      credentials: true,
+    })
+  );
+
   app.use(express.json());
 
   // Swagger Documentation (ARC03)
   app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-  // Health check endpoint
+  // Health check endpoints (versioned /api/v1/health per specification + backward compatibility)
+  const getHealthData = () => ({
+    status: 'ok',
+    version: process.env.npm_package_version || '1.0.0',
+    timestamp: new Date().toISOString(),
+  });
+
+  app.get('/api/v1/health', (req, res) => {
+    res.json(getHealthData());
+  });
+
   app.get('/api/health', (req, res) => {
     res.json({
-      status: 'ok',
+      ...getHealthData(),
       service: 'LaPrizza Back-End REST API',
-      timestamp: new Date().toISOString(),
     });
   });
 

@@ -9,6 +9,7 @@
 
 This repository accommodates all project modules across the semester:
 * **`backend/`**: Node.js & TypeScript REST API following Clean Architecture & Domain-Driven Design (DDD).
+* **`frontend/`**: React + TypeScript single-page application built with Vite and Vitest.
 * **`docs/`**: Architectural documentation, Domain Models, and System Specifications.
 * **`_bmad/`**: AI Agent framework and engineering methodologies.
 
@@ -47,6 +48,24 @@ npm run dev
 The server will be available at:
 * **REST API**: `http://localhost:3000`
 * **Swagger / OpenAPI Documentation**: `http://localhost:3000/api/docs`
+
+---
+
+## 🌐 Getting Started (Front-End)
+
+### Setup & Run
+```bash
+# 1. Navigate to the frontend directory
+cd frontend
+
+# 2. Install dependencies
+npm install
+
+# 3. Start development server
+npm run dev
+```
+
+The frontend will be available at `http://localhost:5173`.
 
 ---
 

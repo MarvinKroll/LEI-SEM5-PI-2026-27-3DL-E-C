@@ -16,8 +16,19 @@ This repository accommodates all project modules across the semester:
 ---
 
 ## 🏛️ Architecture & Domain Documentation
-* **[ARC01 — Core Domain Analysis and Modelling](docs/ARC01-Domain-Model.md)**: Conceptual DDD domain model, entity relationships, business invariants, and cardinalities.
-* **[ARC02 — System Architecture](docs/ARC02-System-Architecture.md)**: 4-layer Clean Architecture (Presentation, Application, Domain, Infrastructure) and inter-module integrations.
+
+### Software Architecture Document (SAD)
+* **[01 — Problem Statement](docs/sad/01-problem-statement.md)**: Executive summary, business context, operational challenges, and success criteria.
+* **[02 — System Context](docs/sad/02-context.md)**: C4 Level 1 Context Diagram, human actors, and cross-module interfaces (ARQSI, LAPR5, SGRAI, IART, ASIST).
+* **[03 — Rationale / ADR-0001](docs/sad/03-Rationale/ADR-0001-architectural-style-and-tech-stack.md)**: Architecture Decision Record for Clean / Onion Architecture and TypeScript stack.
+* **[04 — Principles & Guidelines](docs/sad/04-principles-and-guidelines.md)**: Architectural invariants, SOLID, DDD, REST API design standards, RBAC security, and testing strategy.
+* **[05 — Key Scenarios](docs/sad/05-key-scenarios.md)**: SEI quality attribute scenarios for dynamic pricing, allergen calculation, stock concurrency, and 3D/AI integration.
+
+### Domain & Technical Architecture Views
+* **[Domain Model](docs/domain/domain-model.md)**: Comprehensive DDD Ubiquitous Language, Aggregate Roots, Entities, Value Objects, and Mermaid Class Diagram.
+* **[Component Diagrams](docs/architecture/component-diagram.md)**: C4 Level 2 Container Diagram, C4 Level 3 Back-End Component Diagram, and Clean Architecture layer mappings.
+* **[Client Questions & Clarifications](docs/client-questions.md)**: Formal register of Product Owner Q&A and architectural decisions taken.
+* **[ARC01 — Core Domain Analysis](docs/ARC01-Domain-Model.md)** & **[ARC02 — System Architecture](docs/ARC02-System-Architecture.md)**: Base reference documents.
 
 ---
 
